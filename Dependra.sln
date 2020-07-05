@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dependra", "Dependra\Dependra.csproj", "{56E4AD41-0F8D-40BE-AE17-A4E5B3536323}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dependra.CoreTests", "tests\Dependra.CoreTests\Dependra.CoreTests.csproj", "{89F08132-F2CB-4E83-B752-C3A593B5CDCC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C4DD7333-6630-4C9D-8768-6DC77AA6E924}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,12 @@ Global
 		{56E4AD41-0F8D-40BE-AE17-A4E5B3536323}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56E4AD41-0F8D-40BE-AE17-A4E5B3536323}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56E4AD41-0F8D-40BE-AE17-A4E5B3536323}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89F08132-F2CB-4E83-B752-C3A593B5CDCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89F08132-F2CB-4E83-B752-C3A593B5CDCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89F08132-F2CB-4E83-B752-C3A593B5CDCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89F08132-F2CB-4E83-B752-C3A593B5CDCC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{89F08132-F2CB-4E83-B752-C3A593B5CDCC} = {C4DD7333-6630-4C9D-8768-6DC77AA6E924}
 	EndGlobalSection
 EndGlobal
