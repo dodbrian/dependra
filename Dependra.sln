@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dependra", "Dependra\Dependra.csproj", "{56E4AD41-0F8D-40BE-AE17-A4E5B3536323}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dependra", "src\Dependra\Dependra.csproj", "{56E4AD41-0F8D-40BE-AE17-A4E5B3536323}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dependra.CoreTests", "tests\Dependra.CoreTests\Dependra.CoreTests.csproj", "{89F08132-F2CB-4E83-B752-C3A593B5CDCC}"
 EndProject
