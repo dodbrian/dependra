@@ -8,14 +8,14 @@ namespace Dependra.Domain
         private readonly IList<PackageReference> _packageReferences;
         private readonly IList<Project> _referencedProjects;
 
-        public Project(string name, IList<Project> referencedProjects, IList<PackageReference> packageReferences)
+        public Project(string fullPath)
         {
-            Name = string.IsNullOrWhiteSpace(name) ? throw new ArgumentOutOfRangeException(nameof(name)) : name;
-            _referencedProjects = referencedProjects ?? throw new ArgumentNullException(nameof(referencedProjects));
-            _packageReferences = packageReferences ?? throw new ArgumentNullException(nameof(packageReferences));
+            FullPath = string.IsNullOrWhiteSpace(fullPath)
+                ? throw new ArgumentOutOfRangeException(nameof(fullPath))
+                : fullPath;
         }
 
-        public string Name { get; }
+        public string FullPath { get; }
 
         public IReadOnlyList<Project> ReferencedProjects => _referencedProjects as IReadOnlyList<Project>;
 
