@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using Dependra.Domain;
 
 namespace Dependra.Services
@@ -10,10 +11,8 @@ namespace Dependra.Services
             var projectPaths = Directory.GetFiles(pathToSolution, "*.csproj", SearchOption.AllDirectories);
             var solution = new Solution();
 
-            foreach (var pathToProject in projectPaths)
-            {
-                solution.AddProject(pathToProject);
-            }
+            var projects = projectPaths.Select(path => new Project(path));
+            solution.AddProjectsRange(projects);
 
             return solution;
         }
