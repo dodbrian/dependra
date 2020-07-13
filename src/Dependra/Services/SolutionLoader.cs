@@ -28,7 +28,13 @@ namespace Dependra.Services
                     .Select(path => GetAbsolutePath(project, path))
                     .ToList();
 
-                // project.AddReferencedProject();
+                foreach (var referencedProjectPath in referencedProjectPaths)
+                {
+                    var referencedProject = solution.GetProjectByPath(referencedProjectPath) ??
+                                            new Project(referencedProjectPath);
+
+                    project.AddReferencedProject(referencedProject);
+                }
             }
 
             return solution;
