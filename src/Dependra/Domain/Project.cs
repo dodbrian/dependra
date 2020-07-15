@@ -6,9 +6,10 @@ namespace Dependra.Domain
 {
     public class Project
     {
-        private readonly IList<PackageReference> _packageReferences;
+        private readonly ISet<Package> _referencedPackages = new HashSet<Package>();
         private readonly IDictionary<string, Project> _referencedProjects = new Dictionary<string, Project>();
 
+        public IReadOnlyList<Package> ReferencedPackages => _referencedPackages.ToList();
         public IReadOnlyList<Project> ReferencedProjects => _referencedProjects.Values.ToList();
 
         public Project(string fullPath)
@@ -26,6 +27,14 @@ namespace Dependra.Domain
             if (GetReferencedProjectByPath(referencedProject.FullPath) != null) return;
 
             _referencedProjects[referencedProject.FullPath] = referencedProject;
+        }
+
+        public void AddPackage(Package package)
+        {
+            if (package is null) throw new ArgumentNullException(nameof(package));
+            if (_referencedPackages.Contains(package)) return;
+
+            _referencedPackages.Add(package);
         }
 
         private Project GetReferencedProjectByPath(string pathToProject)

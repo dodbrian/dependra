@@ -35,6 +35,17 @@ namespace Dependra.Services
 
                     project.AddReferencedProject(referencedProject);
                 }
+
+                var packageReferences = projectXml
+                    .Descendants("PackageReference")
+                    .Select(element => (element.Attribute("Include")?.Value, element.Attribute("Version")?.Value))
+                    .ToList();
+
+                foreach (var (packageName, packageVersion) in packageReferences)
+                {
+                    var package = new Package(packageName, packageVersion);
+                    project.AddPackage(package);
+                }
             }
 
             return solution;
