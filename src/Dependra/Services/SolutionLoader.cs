@@ -21,11 +21,11 @@ namespace Dependra.Services
             foreach (var project in projects)
             {
                 var projectXml = XDocument.Load(project.FullPath);
-                var referencedProjectPaths = projectXml.Root?
+                var referencedProjectPaths = projectXml
                     .Descendants("ProjectReference")
                     .Select(element => element.Attribute("Include")?.Value)
                     .Where(path => path != null)
-                    .Select(path => GetAbsolutePath(project, path))
+                    .Select(path => GetAbsolutePath(project.FullPath, path))
                     .ToList();
 
                 foreach (var referencedProjectPath in referencedProjectPaths)
@@ -40,9 +40,9 @@ namespace Dependra.Services
             return solution;
         }
 
-        private static string GetAbsolutePath(Project project, string path)
+        private static string GetAbsolutePath(string fullFilePath, string path)
         {
-            var directoryName = Path.GetDirectoryName(project.FullPath);
+            var directoryName = Path.GetDirectoryName(fullFilePath);
             var normalizedPath = NormalizePath(path);
             var combinedPath = Path.Combine(directoryName ?? string.Empty, normalizedPath);
             var absolutePath = Path.GetFullPath(combinedPath);
