@@ -51,17 +51,17 @@ namespace Dependra.Services
             return solution;
         }
 
-        private static string GetAbsolutePath(string fullFilePath, string path)
+        private static string GetAbsolutePath(string fullFilePath, string relativePath)
         {
             var directoryName = Path.GetDirectoryName(fullFilePath);
-            var normalizedPath = NormalizePath(path);
+            var normalizedPath = EnsureProperDirectorySeparator(relativePath);
             var combinedPath = Path.Combine(directoryName ?? string.Empty, normalizedPath);
             var absolutePath = Path.GetFullPath(combinedPath);
 
             return absolutePath;
         }
 
-        private static string NormalizePath(string path)
+        private static string EnsureProperDirectorySeparator(string path)
         {
             var normalizedPath = path
                 .Replace('\\', Path.DirectorySeparatorChar)
