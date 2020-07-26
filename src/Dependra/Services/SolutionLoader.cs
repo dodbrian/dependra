@@ -12,14 +12,11 @@ namespace Dependra.Services
             var projectPaths = Directory.GetFiles(pathToSolution, "*.csproj", SearchOption.AllDirectories);
             var solution = new Solution();
 
-            var projects = projectPaths
-                .Select(path => new Project(path))
-                .ToList();
-
-            solution.AddProjectsRange(projects);
-
-            foreach (var project in projects)
+            foreach (var projectPath in projectPaths)
             {
+                var project = new Project(projectPath);
+                solution.AddProject(project);
+
                 var projectXml = XDocument.Load(project.FullPath);
                 var referencedProjectPaths = projectXml
                     .Descendants("ProjectReference")
@@ -30,8 +27,12 @@ namespace Dependra.Services
 
                 foreach (var referencedProjectPath in referencedProjectPaths)
                 {
-                    var referencedProject = solution.GetProjectByPath(referencedProjectPath) ??
-                                            new Project(referencedProjectPath);
+                    var referencedProject = solution.GetProjectByPath(referencedProjectPath);
+                    if (referencedProject is null)
+                    {
+                        referencedProject = new Project(referencedProjectPath);
+                        solution.AddProject(referencedProject);
+                    }
 
                     project.AddReferencedProject(referencedProject);
                 }
@@ -43,7 +44,12 @@ namespace Dependra.Services
 
                 foreach (var (packageName, packageVersion) in packageReferences)
                 {
-                    var package = new Package(packageName, packageVersion);
+                    if (!solution.TryGetPackage(packageName, packageVersion, out var package))
+                    {
+                        package = new Package(packageName, packageVersion);
+                        solution.AddPackage(package);
+                    }
+                    
                     project.AddPackage(package);
                 }
             }

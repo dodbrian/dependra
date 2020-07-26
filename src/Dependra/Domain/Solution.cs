@@ -6,10 +6,18 @@ namespace Dependra.Domain
 {
     public class Solution
     {
-        private readonly Dictionary<string, Project> _projects = new Dictionary<string, Project>();
-        
+        private readonly IDictionary<string, Project> _projects = new Dictionary<string, Project>();
+        private readonly IDictionary<(string, string), Package> _packages = new Dictionary<(string, string), Package>();
+
         public int NumberOfProjects => _projects.Count;
         public IReadOnlyList<Project> Projects => _projects.Values.ToList();
+
+        public int NumberOfPackages => _packages.Count;
+
+        public Project GetProjectByPath(string pathToProject)
+        {
+            return _projects.TryGetValue(pathToProject, out var existingProject) ? existingProject : null;
+        }
 
         public void AddProject(Project project)
         {
@@ -19,17 +27,17 @@ namespace Dependra.Domain
             _projects[project.FullPath] = project;
         }
 
-        public void AddProjectsRange(IEnumerable<Project> projects)
+        public bool TryGetPackage(string packageName, string packageVersion, out Package package)
         {
-            foreach (var project in projects)
-            {
-                AddProject(project);
-            }
+            return _packages.TryGetValue((packageName, packageVersion), out package);
         }
 
-        public Project GetProjectByPath(string pathToProject)
+        public void AddPackage(Package package)
         {
-            return _projects.TryGetValue(pathToProject, out var existingProject) ? existingProject : null;
+            if (package is null) throw new ArgumentNullException(nameof(package));
+            if (TryGetPackage(package.Name, package.Version, out _)) return;
+
+            _packages[(package.Name, package.Version)] = package;
         }
     }
 }
