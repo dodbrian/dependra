@@ -14,15 +14,15 @@ namespace Dependra.Domain
 
         public int NumberOfPackages => _packages.Count;
 
-        public Project GetProjectByPath(string pathToProject)
+        public bool TryGetProject(string pathToProject, out Project project)
         {
-            return _projects.TryGetValue(pathToProject, out var existingProject) ? existingProject : null;
+            return _projects.TryGetValue(pathToProject, out project);
         }
 
         public void AddProject(Project project)
         {
             if (project is null) throw new ArgumentNullException(nameof(project));
-            if (GetProjectByPath(project.FullPath) != null) return;
+            if (TryGetProject(project.FullPath, out _)) return;
 
             _projects[project.FullPath] = project;
         }

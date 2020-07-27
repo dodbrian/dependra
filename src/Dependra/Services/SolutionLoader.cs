@@ -27,8 +27,7 @@ namespace Dependra.Services
 
                 foreach (var referencedProjectPath in referencedProjectPaths)
                 {
-                    var referencedProject = solution.GetProjectByPath(referencedProjectPath);
-                    if (referencedProject is null)
+                    if (!solution.TryGetProject(referencedProjectPath, out var referencedProject))
                     {
                         referencedProject = new Project(referencedProjectPath);
                         solution.AddProject(referencedProject);
