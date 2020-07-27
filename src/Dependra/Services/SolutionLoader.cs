@@ -10,7 +10,7 @@ namespace Dependra.Services
         public Solution LoadFromPath(string pathToSolution)
         {
             var projectPaths = Directory.GetFiles(pathToSolution, "*.csproj", SearchOption.AllDirectories);
-            var solution = new Solution();
+            var solution = new Solution(pathToSolution);
 
             foreach (var projectPath in projectPaths)
             {

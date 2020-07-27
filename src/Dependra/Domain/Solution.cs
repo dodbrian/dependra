@@ -6,8 +6,15 @@ namespace Dependra.Domain
 {
     public class Solution
     {
+        public string Path { get; }
+        
         private readonly IDictionary<string, Project> _projects = new Dictionary<string, Project>();
         private readonly IDictionary<(string, string), Package> _packages = new Dictionary<(string, string), Package>();
+
+        public Solution(string path)
+        {
+            Path = path;
+        }
 
         public int NumberOfProjects => _projects.Count;
         public IReadOnlyList<Project> Projects => _projects.Values.ToList();

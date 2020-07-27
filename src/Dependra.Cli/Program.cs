@@ -23,6 +23,7 @@ namespace Dependra.Cli
             var solutionLoader = new SolutionLoader();
             var solution = solutionLoader.LoadFromPath(pathToSolution);
 
+            Console.WriteLine($"Solution folder: {solution.Path}");
             Console.WriteLine($"Number of projects in solution: {solution.NumberOfProjects}");
             Console.WriteLine($"Number of packages in solution: {solution.NumberOfPackages}");
         }
