@@ -7,9 +7,11 @@ namespace Dependra.Services
 {
     public class SolutionLoader
     {
+        private const string CsProjectSearchPattern = "*.csproj";
+
         public Solution LoadFromPath(string pathToSolution)
         {
-            var projectPaths = Directory.GetFiles(pathToSolution, "*.csproj", SearchOption.AllDirectories);
+            var projectPaths = Directory.GetFiles(pathToSolution, CsProjectSearchPattern, SearchOption.AllDirectories);
             var solution = new Solution(pathToSolution);
 
             foreach (var projectPath in projectPaths)
@@ -48,7 +50,7 @@ namespace Dependra.Services
                         package = new Package(packageName, packageVersion);
                         solution.AddPackage(package);
                     }
-                    
+
                     project.AddPackage(package);
                 }
             }
