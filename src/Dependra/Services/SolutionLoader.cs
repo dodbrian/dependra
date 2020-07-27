@@ -1,33 +1,37 @@
-using System.IO;
-using System.Linq;
-using System.Xml.Linq;
+using Dependra.Common;
 using Dependra.Domain;
+using Dependra.Services.Contracts;
 
 namespace Dependra.Services
 {
     public class SolutionLoader
     {
+        private readonly IFileService _fileService;
+        private readonly IProjectLoader _projectLoader;
+
         private const string CsProjectSearchPattern = "*.csproj";
+
+        public SolutionLoader(IFileService fileService, IProjectLoader projectLoader)
+        {
+            _fileService = fileService;
+            _projectLoader = projectLoader;
+        }
 
         public Solution LoadFromPath(string pathToSolution)
         {
-            var projectPaths = Directory.GetFiles(pathToSolution, CsProjectSearchPattern, SearchOption.AllDirectories);
             var solution = new Solution(pathToSolution);
+            var projectPaths = _fileService.GetFilesInDirectory(pathToSolution, CsProjectSearchPattern);
 
-            foreach (var projectPath in projectPaths)
+            foreach (var projectPath in projectPaths.EmptyIfNull())
             {
+                _projectLoader.Load(projectPath);
+
                 var project = new Project(projectPath);
                 solution.AddProject(project);
 
-                var projectXml = XDocument.Load(project.FullPath);
-                var referencedProjectPaths = projectXml
-                    .Descendants("ProjectReference")
-                    .Select(element => element.Attribute("Include")?.Value)
-                    .Where(path => path != null)
-                    .Select(path => GetAbsolutePath(project.FullPath, path))
-                    .ToList();
+                var referencedProjectPaths = _projectLoader.GetReferencedProjectPaths();
 
-                foreach (var referencedProjectPath in referencedProjectPaths)
+                foreach (var referencedProjectPath in referencedProjectPaths.EmptyIfNull())
                 {
                     if (!solution.TryGetProject(referencedProjectPath, out var referencedProject))
                     {
@@ -38,12 +42,9 @@ namespace Dependra.Services
                     project.AddReferencedProject(referencedProject);
                 }
 
-                var packageReferences = projectXml
-                    .Descendants("PackageReference")
-                    .Select(element => (element.Attribute("Include")?.Value, element.Attribute("Version")?.Value))
-                    .ToList();
+                var packageReferences = _projectLoader.GetPackageReferences();
 
-                foreach (var (packageName, packageVersion) in packageReferences)
+                foreach (var (packageName, packageVersion) in packageReferences.EmptyIfNull())
                 {
                     if (!solution.TryGetPackage(packageName, packageVersion, out var package))
                     {
@@ -56,25 +57,6 @@ namespace Dependra.Services
             }
 
             return solution;
-        }
-
-        private static string GetAbsolutePath(string fullFilePath, string relativePath)
-        {
-            var directoryName = Path.GetDirectoryName(fullFilePath);
-            var normalizedPath = EnsureProperDirectorySeparator(relativePath);
-            var combinedPath = Path.Combine(directoryName ?? string.Empty, normalizedPath);
-            var absolutePath = Path.GetFullPath(combinedPath);
-
-            return absolutePath;
-        }
-
-        private static string EnsureProperDirectorySeparator(string path)
-        {
-            var normalizedPath = path
-                .Replace('\\', Path.DirectorySeparatorChar)
-                .Replace('/', Path.DirectorySeparatorChar);
-
-            return normalizedPath;
         }
     }
 }

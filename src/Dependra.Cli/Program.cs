@@ -20,7 +20,7 @@ namespace Dependra.Cli
                 pathToSolution = args[0];
             }
 
-            var solutionLoader = new SolutionLoader();
+            var solutionLoader = new SolutionLoader(new FileService(), new ProjectLoader());
             var solution = solutionLoader.LoadFromPath(pathToSolution);
 
             Console.WriteLine($"Solution folder: {solution.Path}");
