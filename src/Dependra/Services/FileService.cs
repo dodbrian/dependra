@@ -12,5 +12,24 @@ namespace Dependra.Services
 
             return projectPaths;
         }
+
+        public string GetAbsolutePath(string fullFilePath, string relativePath)
+        {
+            var directoryName = Path.GetDirectoryName(fullFilePath);
+            var normalizedPath = EnsureProperDirectorySeparator(relativePath);
+            var combinedPath = Path.Combine(directoryName ?? string.Empty, normalizedPath);
+            var absolutePath = Path.GetFullPath(combinedPath);
+
+            return absolutePath;
+        }
+
+        public string EnsureProperDirectorySeparator(string path)
+        {
+            var normalizedPath = path
+                .Replace('\\', Path.DirectorySeparatorChar)
+                .Replace('/', Path.DirectorySeparatorChar);
+
+            return normalizedPath;
+        }
     }
 }
