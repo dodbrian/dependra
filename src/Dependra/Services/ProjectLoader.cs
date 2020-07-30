@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Dependra.Services.Contracts;
@@ -8,8 +7,15 @@ namespace Dependra.Services
 {
     public class ProjectLoader : IProjectLoader
     {
+        private readonly IFileService _fileService;
+
         private XDocument _projectXml;
         private string _projectFullPath;
+
+        public ProjectLoader(IFileService fileService)
+        {
+            _fileService = fileService;
+        }
 
         public void Load(string projectFullPath)
         {
@@ -23,7 +29,7 @@ namespace Dependra.Services
                 .Descendants("ProjectReference")
                 .Select(element => element.Attribute("Include")?.Value)
                 .Where(path => path != null)
-                .Select(path => GetAbsolutePath(_projectFullPath, path))
+                .Select(path => _fileService.GetAbsolutePath(_projectFullPath, path))
                 .ToList();
 
             return paths;
@@ -38,24 +44,5 @@ namespace Dependra.Services
 
             return packageReferences;
         }
-
-        private static string GetAbsolutePath(string fullFilePath, string relativePath)
-        {
-            var directoryName = Path.GetDirectoryName(fullFilePath);
-            var normalizedPath = EnsureProperDirectorySeparator(relativePath);
-            var combinedPath = Path.Combine(directoryName ?? string.Empty, normalizedPath);
-            var absolutePath = Path.GetFullPath(combinedPath);
-
-            return absolutePath;
-        }
-
-        private static string EnsureProperDirectorySeparator(string path)
-        {
-            var normalizedPath = path
-                .Replace('\\', Path.DirectorySeparatorChar)
-                .Replace('/', Path.DirectorySeparatorChar);
-
-            return normalizedPath;
-        }
-   }
+    }
 }
