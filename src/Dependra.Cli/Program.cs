@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using Dependra.Services;
 
 namespace Dependra.Cli
@@ -27,6 +28,21 @@ namespace Dependra.Cli
             Console.WriteLine($"Solution folder: {solution.Path}");
             Console.WriteLine($"Number of projects in solution: {solution.NumberOfProjects}");
             Console.WriteLine($"Number of packages in solution: {solution.NumberOfPackages}");
+
+            var projection = solution.Projects
+                .Select(project => new
+                {
+                    project.FullPath,
+                    Packages = project.ReferencedPackages.Select(package => $"{package.Name}, {package.Version}"),
+                    Projects = project.ReferencedProjects.Select(refProject => refProject.FullPath)
+                });
+
+            var json = JsonSerializer.Serialize(projection, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+
+            Console.WriteLine(json);
         }
     }
 }
