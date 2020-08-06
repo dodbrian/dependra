@@ -16,9 +16,9 @@ namespace Dependra.Services
 
         public string GetAbsolutePath(string fullFilePath, string relativePath)
         {
-            var directoryName = Path.GetDirectoryName(fullFilePath);
-            var normalizedPath = EnsureProperDirectorySeparator(relativePath);
-            var combinedPath = Path.Combine(directoryName ?? string.Empty, normalizedPath);
+            var basePath = Path.GetDirectoryName(fullFilePath);
+            var normalizedRelativePath = EnsureProperDirectorySeparator(relativePath ?? string.Empty);
+            var combinedPath = Path.Combine(basePath ?? string.Empty, normalizedRelativePath);
             var absolutePath = Path.GetFullPath(combinedPath);
 
             return absolutePath;
