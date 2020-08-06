@@ -26,19 +26,12 @@ namespace Dependra.Services
             {
                 _projectLoader.Load(projectPath);
 
-                var project = new Project(projectPath);
-                solution.AddProject(project);
-
+                var project = GetOrAddProject(solution, projectPath);
                 var referencedProjectPaths = _projectLoader.GetReferencedProjectPaths();
 
                 foreach (var referencedProjectPath in referencedProjectPaths.EmptyIfNull())
                 {
-                    if (!solution.TryGetProject(referencedProjectPath, out var referencedProject))
-                    {
-                        referencedProject = new Project(referencedProjectPath);
-                        solution.AddProject(referencedProject);
-                    }
-
+                    var referencedProject = GetOrAddProject(solution, referencedProjectPath);
                     project.AddReferencedProject(referencedProject);
                 }
 
@@ -57,6 +50,16 @@ namespace Dependra.Services
             }
 
             return solution;
+        }
+
+        private static Project GetOrAddProject(Solution solution, string projectPath)
+        {
+            if (solution.TryGetProject(projectPath, out var project)) return project;
+
+            project = new Project(projectPath);
+            solution.AddProject(project);
+
+            return project;
         }
     }
 }
