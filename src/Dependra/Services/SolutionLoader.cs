@@ -1,3 +1,4 @@
+using System.IO;
 using Dependra.Common;
 using Dependra.Domain;
 using Dependra.Services.Contracts;
@@ -19,6 +20,14 @@ namespace Dependra.Services
 
         public Solution LoadFromPath(string pathToSolution)
         {
+            // todo Extract to FileService and write tests
+            if (!Path.IsPathRooted(pathToSolution))
+            {
+                var currentDirectory = Directory.GetCurrentDirectory();
+                pathToSolution = Path.Combine(currentDirectory, pathToSolution);
+                pathToSolution = Path.GetFullPath(pathToSolution);
+            }
+
             var solution = new Solution(pathToSolution);
             var projectPaths = _fileService.GetFilesInDirectory(pathToSolution, CsProjectSearchPattern);
 
