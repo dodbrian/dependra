@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using Dependra.Services.Contracts;
 
 namespace Dependra.Services
@@ -25,9 +26,10 @@ namespace Dependra.Services
 
         public string EnsureProperDirectorySeparator(string path)
         {
-            var normalizedPath = path
-                .Replace('\\', Path.DirectorySeparatorChar)
-                .Replace('/', Path.DirectorySeparatorChar);
+            var normalizedPath = Regex.Replace(
+                path,
+                @"((\\)+)|(\/+)",
+                Path.DirectorySeparatorChar.ToString());
 
             return normalizedPath;
         }
