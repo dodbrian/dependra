@@ -7,5 +7,6 @@ namespace Dependra.Services.Contracts
         IEnumerable<string> GetFilesInDirectory(string pathToSolution, string searchPattern);
         string GetAbsolutePath(string fullFilePath, string relativePath);
         string EnsureProperDirectorySeparator(string path);
+        string GetAbsolutePathBasedOnCurrent(string relativePath);
     }
 }

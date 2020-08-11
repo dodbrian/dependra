@@ -24,6 +24,10 @@ namespace Dependra.CoreTests
                     "/home/user/solution/project3/Project3.csproj"
                 });
 
+            fileServiceMoq
+                .Setup(service => service.GetAbsolutePathBasedOnCurrent(TestPath))
+                .Returns(TestPath);
+
             var projectLoaderMoq = new Mock<IProjectLoader>();
             projectLoaderMoq
                 .SetupSequence(loader => loader.GetReferencedProjectPaths())

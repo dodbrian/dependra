@@ -33,5 +33,16 @@ namespace Dependra.Services
 
             return normalizedPath;
         }
+
+        public string GetAbsolutePathBasedOnCurrent(string relativePath)
+        {
+            if (Path.IsPathRooted(relativePath)) return relativePath;
+
+            var currentDirectory = Directory.GetCurrentDirectory();
+            relativePath = Path.Combine(currentDirectory, relativePath);
+            relativePath = Path.GetFullPath(relativePath);
+
+            return relativePath;
+        }
     }
 }
