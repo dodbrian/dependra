@@ -12,10 +12,7 @@ namespace Dependra.Services
         private XDocument _projectXml;
         private string _projectFullPath;
 
-        public ProjectLoader(IFileService fileService)
-        {
-            _fileService = fileService;
-        }
+        public ProjectLoader(IFileService fileService) => _fileService = fileService;
 
         public void Load(string projectFullPath)
         {
