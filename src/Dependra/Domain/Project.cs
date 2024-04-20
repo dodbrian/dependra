@@ -2,44 +2,43 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Dependra.Domain
+namespace Dependra.Domain;
+
+public class Project
 {
-    public class Project
+    private readonly ISet<Package> _referencedPackages = new HashSet<Package>();
+    private readonly IDictionary<string, Project> _referencedProjects = new Dictionary<string, Project>();
+
+    public IReadOnlyList<Package> ReferencedPackages => _referencedPackages.ToList();
+    public IReadOnlyList<Project> ReferencedProjects => _referencedProjects.Values.ToList();
+
+    public Project(string fullPath)
     {
-        private readonly ISet<Package> _referencedPackages = new HashSet<Package>();
-        private readonly IDictionary<string, Project> _referencedProjects = new Dictionary<string, Project>();
+        FullPath = string.IsNullOrWhiteSpace(fullPath)
+            ? throw new ArgumentOutOfRangeException(nameof(fullPath))
+            : fullPath;
+    }
 
-        public IReadOnlyList<Package> ReferencedPackages => _referencedPackages.ToList();
-        public IReadOnlyList<Project> ReferencedProjects => _referencedProjects.Values.ToList();
+    public string FullPath { get; }
 
-        public Project(string fullPath)
-        {
-            FullPath = string.IsNullOrWhiteSpace(fullPath)
-                ? throw new ArgumentOutOfRangeException(nameof(fullPath))
-                : fullPath;
-        }
+    public void AddReferencedProject(Project referencedProject)
+    {
+        if (referencedProject is null) throw new ArgumentNullException(nameof(referencedProject));
 
-        public string FullPath { get; }
+        if (GetReferencedProjectByPath(referencedProject.FullPath) != null) return;
 
-        public void AddReferencedProject(Project referencedProject)
-        {
-            if (referencedProject is null) throw new ArgumentNullException(nameof(referencedProject));
-            if (GetReferencedProjectByPath(referencedProject.FullPath) != null) return;
+        _referencedProjects[referencedProject.FullPath] = referencedProject;
+    }
 
-            _referencedProjects[referencedProject.FullPath] = referencedProject;
-        }
+    public void AddPackage(Package package)
+    {
+        if (package is null) throw new ArgumentNullException(nameof(package));
 
-        public void AddPackage(Package package)
-        {
-            if (package is null) throw new ArgumentNullException(nameof(package));
-            if (_referencedPackages.Contains(package)) return;
+        _referencedPackages.Add(package);
+    }
 
-            _referencedPackages.Add(package);
-        }
-
-        private Project GetReferencedProjectByPath(string pathToProject)
-        {
-            return _referencedProjects.TryGetValue(pathToProject, out var project) ? project : null;
-        }
+    private Project GetReferencedProjectByPath(string pathToProject)
+    {
+        return _referencedProjects.TryGetValue(pathToProject, out var project) ? project : null;
     }
 }

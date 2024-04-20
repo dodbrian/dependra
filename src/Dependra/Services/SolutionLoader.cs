@@ -2,66 +2,65 @@ using Dependra.Common;
 using Dependra.Domain;
 using Dependra.Services.Contracts;
 
-namespace Dependra.Services
+namespace Dependra.Services;
+
+public class SolutionLoader
 {
-    public class SolutionLoader
+    private readonly IFileService _fileService;
+    private readonly IProjectLoader _projectLoader;
+
+    private const string CsProjectSearchPattern = "*.csproj";
+
+    public SolutionLoader(IFileService fileService, IProjectLoader projectLoader)
     {
-        private readonly IFileService _fileService;
-        private readonly IProjectLoader _projectLoader;
+        _fileService = fileService;
+        _projectLoader = projectLoader;
+    }
 
-        private const string CsProjectSearchPattern = "*.csproj";
+    public Solution LoadFromPath(string pathToSolution)
+    {
+        pathToSolution = _fileService.GetAbsolutePathBasedOnCurrent(pathToSolution);
 
-        public SolutionLoader(IFileService fileService, IProjectLoader projectLoader)
+        var solution = new Solution(pathToSolution);
+        var projectPaths = _fileService.GetFilesInDirectory(pathToSolution, CsProjectSearchPattern);
+
+        foreach (var projectPath in projectPaths.EmptyIfNull())
         {
-            _fileService = fileService;
-            _projectLoader = projectLoader;
-        }
+            _projectLoader.Load(projectPath);
 
-        public Solution LoadFromPath(string pathToSolution)
-        {
-            pathToSolution = _fileService.GetAbsolutePathBasedOnCurrent(pathToSolution);
+            var project = GetOrAddProject(solution, projectPath);
+            var referencedProjectPaths = _projectLoader.GetReferencedProjectPaths();
 
-            var solution = new Solution(pathToSolution);
-            var projectPaths = _fileService.GetFilesInDirectory(pathToSolution, CsProjectSearchPattern);
-
-            foreach (var projectPath in projectPaths.EmptyIfNull())
+            foreach (var referencedProjectPath in referencedProjectPaths.EmptyIfNull())
             {
-                _projectLoader.Load(projectPath);
-
-                var project = GetOrAddProject(solution, projectPath);
-                var referencedProjectPaths = _projectLoader.GetReferencedProjectPaths();
-
-                foreach (var referencedProjectPath in referencedProjectPaths.EmptyIfNull())
-                {
-                    var referencedProject = GetOrAddProject(solution, referencedProjectPath);
-                    project.AddReferencedProject(referencedProject);
-                }
-
-                var packageReferences = _projectLoader.GetPackageReferences();
-
-                foreach (var (packageName, packageVersion) in packageReferences.EmptyIfNull())
-                {
-                    if (!solution.TryGetPackage(packageName, packageVersion, out var package))
-                    {
-                        package = new Package(packageName, packageVersion);
-                        solution.AddPackage(package);
-                    }
-
-                    project.AddPackage(package);
-                }
+                var referencedProject = GetOrAddProject(solution, referencedProjectPath);
+                project.AddReferencedProject(referencedProject);
             }
 
-            return solution;
+            var packageReferences = _projectLoader.GetPackageReferences();
+
+            foreach (var (packageName, packageVersion) in packageReferences.EmptyIfNull())
+            {
+                if (!solution.TryGetPackage(packageName, packageVersion, out var package))
+                {
+                    package = new Package(packageName, packageVersion);
+                    solution.AddPackage(package);
+                }
+
+                project.AddPackage(package);
+            }
         }
 
-        private static Project GetOrAddProject(Solution solution, string projectPath)
-        {
-            if (solution.TryGetProject(projectPath, out var project)) return project;
+        return solution;
+    }
 
-            project = new Project(projectPath);
-            solution.AddProject(project);
+    private static Project GetOrAddProject(Solution solution, string projectPath)
+    {
+        if (solution.TryGetProject(projectPath, out var project)) return project;
 
-            return project;
-        }
+        project = new Project(projectPath);
+        solution.AddProject(project);
+
+        return project;
     }
 }
